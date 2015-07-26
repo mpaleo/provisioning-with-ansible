@@ -1,0 +1,13 @@
+---
+- name: Install node
+  apt: pkg=nodejs state=latest
+
+- name: Create symlink
+  file: src=/usr/bin/nodejs dest=/usr/bin/node state=link
+
+- name: npm | Install npm
+  apt: pkg=npm state=latest
+
+- name: npm | Install npm packages
+  npm: name={{ item }} global=yes
+  with_items: npm.packages

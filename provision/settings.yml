@@ -1,0 +1,38 @@
+---
+server:
+  box: ubuntu/trusty32
+  hostname: server
+  private_ip: 192.168.10.30
+  name: provisioning_with_ansible
+  memory: 1024
+  swap_sz: 512
+  cpus: 1
+  packages: [git, htop, iotop, curl, memcached]
+nginx:
+  - docroot: /www/site-one.local
+    docroot_public: /www/site-one.local/public
+    local_project_path: ~/path_to/site-one.local
+    servername: site-one.local
+    port: 80
+    preinstall:
+      wordpress: no
+  - docroot: /www/site-two.local
+    docroot_public: /www/site-two.local/public
+    local_project_path: ~/path_to/site-two.local
+    servername: site-two.local
+    port: 80
+    preinstall:
+      wordpress: no
+mysql:
+  root_password: root_secret
+  databases:
+    - name: db_one
+      user: db_one_user
+      password: db_one_user_secret
+    - name: db_two
+      user: db_two_user
+      password: db_two_user_secret
+php:
+  packages: [php5-cli, php5-mcrypt, php5-curl, php5-mysql, php5-memcached]
+npm:
+  packages: [bower, grunt, typescript, less, yo, gulp]

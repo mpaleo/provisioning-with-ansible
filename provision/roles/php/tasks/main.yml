@@ -1,0 +1,35 @@
+---
+- name: Add ppa repository
+  apt_repository: repo=ppa:ondrej/php5-5.6
+
+- name: Update apt cache
+  apt: update_cache=yes
+
+- name: Install php
+  apt: pkg=php5 state=latest
+
+- name: Install fpm
+  apt: pkg=php5-fpm state=latest
+
+- name: Install packages
+  apt: pkg={{ item }} state=latest
+  with_items: php.packages
+  when: php.packages is defined
+
+- name: composer | Install Composer
+  shell: curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer creates=/usr/local/bin/composer
+
+- name: composer | Add composer to path
+  lineinfile: dest=/home/vagrant/.profile line=PATH="/home/vagrant/.composer/vendor/bin:$PATH" create=yes
+
+- name: laravel | Get Laravel Installer
+  sudo: false
+  shell: composer global require "laravel/installer=~1.1"
+
+- name: laravel | Get Lumen Installer
+  sudo: false
+  command: composer global require "laravel/lumen-installer=~1.0"
+
+- name: laravel | Get Envoy
+  sudo: false
+  command: composer global require "laravel/envoy=~1.0"

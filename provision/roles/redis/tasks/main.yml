@@ -1,0 +1,9 @@
+---
+- name: Add ppa repository
+  apt_repository: repo=ppa:chris-lea/redis-server
+
+- name: Update apt cache
+  apt: update_cache=yes
+
+- name: Install redis
+  apt: pkg=redis-server state=latest

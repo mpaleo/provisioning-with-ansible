@@ -1,0 +1,16 @@
+---
+- name: Update apt cache
+  apt: update_cache=yes
+
+- name: Install packages
+  apt: pkg={{ item }} state=latest
+  with_items: server.packages
+  when: server.packages is defined
+
+- name: Enable swap
+  command: /bin/dd if=/dev/zero of=/var/swap.1 bs=1M count={{ server.swap_sz }} creates=/var/swap.1
+  register: swap
+- command: /sbin/mkswap /var/swap.1
+  when: swap.changed
+- command: /sbin/swapon /var/swap.1
+  when: swap.changed

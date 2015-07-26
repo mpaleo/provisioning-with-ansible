@@ -1,0 +1,14 @@
+---
+- name: wordpress | Extract WordPress
+  unarchive: src=/tmp/wordpress.tar.gz dest=/tmp copy=no
+
+- name: wordpress | Copy WordPress files
+  shell: rsync -a /tmp/wordpress/ {{ item.docroot }}
+  with_items: nginx
+  when: item.preinstall.wordpress
+
+- name: wordpress | Clean WordPress src files
+  file: path=/tmp/{{ item }} state=absent
+  with_items:
+    - wordpress.tar.gz
+    - wordpress

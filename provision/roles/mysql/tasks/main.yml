@@ -1,0 +1,26 @@
+---
+- name: Install MySQL packages
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - mysql-server
+    - python-mysqldb
+
+- name: Update root password
+  mysql_user: name=root host={{ item }} check_implicit_admin=yes password={{ mysql.root_password }} login_user=root login_password={{ mysql.root_password }}
+  with_items:
+    - "{{ server.hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: Create databases
+  mysql_db: name={{ item.name }} state=present login_user=root login_password={{ mysql.root_password }}
+  with_items: mysql.databases
+
+- name: Create users
+  mysql_user: name={{ item.user }} password={{ item.password }} host=% priv={{ item.name }}.*:ALL state=present login_user=root login_password={{ mysql.root_password }}
+  with_items: mysql.databases
+
+- name: Allow remote connection
+  lineinfile: dest=/etc/mysql/my.cnf regexp=^(.*)bind-address line="bind-address=0.0.0.0"
+  notify: restart mysql

@@ -1,0 +1,27 @@
+---
+- name: Install Nginx
+  apt: pkg=nginx state=latest
+
+- name: Remove default site config
+  file: path=/etc/nginx/sites-{{ item }}/default state=absent
+  with_items:
+      - available
+      - enabled
+
+- name: Create sites
+  template: src=default.tpl dest=/etc/nginx/sites-available/{{ item.servername }} group=root owner=root
+  with_items: nginx
+
+- name: Enable sites
+  file: src=/etc/nginx/sites-available/{{ item.servername }} dest=/etc/nginx/sites-enabled/{{ item.servername }} state=link
+  with_items: nginx
+  notify: restart nginx
+
+- name: wordpress | Check and get WordPress
+  get_url: url=https://wordpress.org/latest.tar.gz dest=/tmp/wordpress.tar.gz validate_certs=no
+  with_items: nginx
+  when: item.preinstall.wordpress
+  register: wordpress_preinstall
+
+- include: wordpress.yml
+  when: wordpress_preinstall.changed
