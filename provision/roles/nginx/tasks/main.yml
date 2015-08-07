@@ -1,4 +1,7 @@
 ---
+- name: Remove Apache
+  apt: pkg=apache2* state=absent purge=yes force=yes
+
 - name: Install Nginx
   apt: pkg=nginx state=latest
 
